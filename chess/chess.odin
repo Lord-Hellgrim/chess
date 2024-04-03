@@ -174,8 +174,8 @@ init_board :: proc() -> [8][8]Tile {
     return board
 }
 
-cell_width :f32 : 128;
-cell_height :f32 : 128;
+cell_width :f32 : 64;
+cell_height :f32 : 64;
 
 PAWN :[16][16]u8 : {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -292,11 +292,11 @@ QUEEN :[16][16]u8 : {
 };
 
 LIGHTGREEN : rl.Color : {
-    r = 150,
-    g = 255,
-    b = 150,
-    a = 255, 
-}
+    150,
+    255,
+    150,
+    255, 
+};
 
 draw_piece :: proc(i: int, j: int, owner: Side, shape: [16][16]u8) {
     
@@ -311,10 +311,10 @@ draw_piece :: proc(i: int, j: int, owner: Side, shape: [16][16]u8) {
         for y in 0..<16 {
             if shape[y][x] == 1 {
                 rect := rl.Rectangle{
-                    x      = f32(i+x) * 8,
-                    y      = f32(j+y) * 8,
-                    width  = 8,
-                    height = 8,
+                    x      = f32(i+x) * 4,
+                    y      = f32(j+y) * 4,
+                    width  = 4,
+                    height = 4,
                 }
                 rl.DrawRectangleRec(rect, color);
             }
@@ -331,16 +331,16 @@ render_board :: proc(game_state: ^GameState, color: rl.Color) {
                 rect := rl.Rectangle{
                     x      = f32(i) * cell_width,
                     y      = f32(j) * cell_height,
-                    width  = cell_width-10,
-                    height = cell_height-10,
+                    width  = cell_width-5,
+                    height = cell_height-5,
                 }
                 rl.DrawRectangleRec(rect, color);
             } else {
                 rect := rl.Rectangle{
                     x      = f32(i) * cell_width,
                     y      = f32(j) * cell_height,
-                    width  = cell_width-10,
-                    height = cell_height-10,
+                    width  = cell_width-5,
+                    height = cell_height-5,
                 }
                 rl.DrawRectangleRec(rect, rl.DARKGRAY);
             }
@@ -349,16 +349,16 @@ render_board :: proc(game_state: ^GameState, color: rl.Color) {
                 rect := rl.Rectangle{
                     x      = f32(i) * cell_width,
                     y      = f32(j) * cell_height,
-                    width  = cell_width-10,
-                    height = cell_height-10,
+                    width  = cell_width-5,
+                    height = cell_height-5,
                 }
                 rl.DrawRectangleRec(rect, rl.GREEN);
             } else if game_state.board[i][j].can_move {
                 rect := rl.Rectangle{
                     x      = f32(i) * cell_width,
                     y      = f32(j) * cell_height,
-                    width  = cell_width-10,
-                    height = cell_height-10,
+                    width  = cell_width-5,
+                    height = cell_height-5,
                 }
                 rl.DrawRectangleRec(rect, LIGHTGREEN);
             }
@@ -448,7 +448,7 @@ main::proc() {
 
     user_input: User_Input;
 
-    rl.InitWindow(1024, 1024, "test");
+    rl.InitWindow(512, 512, "test");
     rl.SetWindowState( rl.ConfigFlags{} );
     rl.SetTargetFPS(60);
 
@@ -458,8 +458,8 @@ main::proc() {
 
         process_user_input(&user_input);
         if user_input.left_mouse_clicked {
-            tile_x := user_input.mouse_tile_x/128;
-            tile_y := user_input.mouse_tile_y/128;
+            tile_x := user_input.mouse_tile_x/64;
+            tile_y := user_input.mouse_tile_y/64;
             if game.board[tile_x][tile_y].selected {
                 game.board[tile_x][tile_y].selected = false;
                 selected_tile = game.board[tile_x][tile_y];
