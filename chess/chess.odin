@@ -5,6 +5,7 @@ import fmt "core:fmt"
 
 
 Side :: enum {
+    None,
     White,
     Black,
 }
@@ -29,7 +30,6 @@ Piece :: struct {
 Tile :: struct {
     selected: bool,
     can_move: bool,
-    will_move: bool,
     piece: Piece,
     x: int,
     y: int,
@@ -200,6 +200,7 @@ ROOK :[16][16]u8 : {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,1,0,1,0,1,0,1,0,1,0,0,0,0},
     {0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0},
+    {0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0},
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
@@ -208,8 +209,7 @@ ROOK :[16][16]u8 : {
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
     {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
-    {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
-    {0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0},
+    {0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0},
     {0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0},
     {0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -435,6 +435,120 @@ set_can_move :: proc(game: ^GameState, x: int, y: int) -> bool{
     }
 } 
 
+show_bishop_moves :: proc(game: ^GameState, selected_tile: ^Tile) {
+    current_x := selected_tile.x;
+    current_y := selected_tile.y;
+    for current_x > 0 && current_y > 0 {
+        current_x -= 1;
+        current_y -= 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        } else {
+            game.board[current_x][current_y].can_move = true;
+        }
+    }
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_x < 7 && current_y > 0 {
+        current_x += 1;
+        current_y -= 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        } else {
+            game.board[current_x][current_y].can_move = true;
+        }
+    }
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_x > 0 && current_y < 7 {
+        current_x -= 1;
+        current_y += 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        } else {
+            game.board[current_x][current_y].can_move = true;
+        }
+    }
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_x < 7 && current_y < 7 {
+        current_x += 1;
+        current_y += 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        } else {
+            game.board[current_x][current_y].can_move = true;
+        }
+    }
+}
+
+show_rook_moves :: proc(game: ^GameState, selected_tile: ^Tile) {
+
+    current_x := selected_tile.x;
+    current_y := selected_tile.y;
+    for current_x > 0 {
+        current_x -= 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        }
+        game.board[current_x][current_y].can_move = true;
+    }
+
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_x < 7 {
+        current_x += 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        }
+        game.board[current_x][current_y].can_move = true;
+    }
+
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_y > 0 {
+        current_y -= 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        }
+        game.board[current_x][current_y].can_move = true;
+    }
+
+    current_x = selected_tile.x;
+    current_y = selected_tile.y;
+    for current_y < 7 {
+        current_y += 1;
+        if game.board[current_x][current_y].piece.type != .None {
+            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
+                game.board[current_x][current_y].can_move = true;
+                break;
+            } else {break}
+        }
+        game.board[current_x][current_y].can_move = true;
+    }
+}
+
 main::proc() {
 
     Board := init_board();
@@ -453,6 +567,7 @@ main::proc() {
     rl.SetTargetFPS(60);
 
     selected_tile: Tile;
+    last_selected_tile: Tile;
 
     for !rl.WindowShouldClose() {
 
@@ -464,7 +579,7 @@ main::proc() {
                 game.board[tile_x][tile_y].selected = false;
                 selected_tile = game.board[tile_x][tile_y];
 
-            } else if !(game.board[tile_x][tile_y].piece.type == PieceType.None) {
+            } else /*if !(game.board[tile_x][tile_y].piece.type == PieceType.None)*/ {
                 
                 for i in 0..<8 {
                     for j in 0..<8 {
@@ -475,13 +590,38 @@ main::proc() {
                 game.board[tile_x][tile_y].selected = true;
                 
                 selected_tile = game.board[tile_x][tile_y];
+                fmt.print("selected x:");
                 fmt.print(selected_tile.x);
                 fmt.print("\t");
+                fmt.print("selected_y");
                 fmt.println(selected_tile.y);
+                fmt.println(selected_tile.piece.owner);
+                fmt.print("last_selected x:");
+                fmt.print(last_selected_tile.x);
+                fmt.print("\t");
+                fmt.print("last_selected_y");
+                fmt.println(last_selected_tile.y);
+                fmt.println(last_selected_tile.piece.owner);
 
             }
 
+            if selected_tile.can_move {
+
+                for i in 0..<8 {
+                    for j in 0..<8 {
+                        game.board[i][j].can_move = false;
+                    }
+                }
+
+                game.board[tile_x][tile_y].piece = last_selected_tile.piece;
+                game.board[last_selected_tile.x][last_selected_tile.y].piece = Piece {};
+                game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+                selected_tile.piece = Piece{};
+                continue;
+            }
         }
+
+        
 
         if !selected_tile.selected {
             for i in 0..<8 {
@@ -489,11 +629,35 @@ main::proc() {
                     game.board[i][j].can_move = false;
                 }
             }
+
+            
         } else {
 
             switch selected_tile.piece.type {
                 case .None: {
-                    
+
+                    for i in 0..<8 {
+                        for j in 0..<8 {
+                            game.board[i][j].selected = false;
+                        }
+                    }
+
+                    for i in 0..<8 {
+                        for j in 0..<8 {
+                            game.board[i][j].can_move = false;
+                        }
+                    }
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.None,
+                            owner = Side.None,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
+
                 }
                 case .Pawn: {
     
@@ -502,6 +666,7 @@ main::proc() {
                             game.board[i][j].can_move = false;
                         }
                     }
+                    
     
                     if selected_tile.piece.owner == Side.Black {
                         if !selected_tile.piece.moved {
@@ -518,6 +683,20 @@ main::proc() {
                             game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
                         }
                     }
+
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.Pawn,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
+                    
+
                 }
                 case .Knight: {
                     for i in 0..<8 {
@@ -542,6 +721,19 @@ main::proc() {
                             }
                         }
                     }
+
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.Knight,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
+
     
                 }
                 case .Bishop: {
@@ -551,62 +743,21 @@ main::proc() {
                         }
                     }
 
-                    current_x := selected_tile.x;
-                    current_y := selected_tile.y;
-                    for current_x > 0 && current_y > 0 {
-                        current_x -= 1;
-                        current_y -= 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        } else {
-                            game.board[current_x][current_y].can_move = true;
-                        }
-                    }
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_x < 7 && current_y > 0 {
-                        current_x += 1;
-                        current_y -= 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        } else {
-                            game.board[current_x][current_y].can_move = true;
-                        }
-                    }
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_x > 0 && current_y < 7 {
-                        current_x -= 1;
-                        current_y += 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        } else {
-                            game.board[current_x][current_y].can_move = true;
-                        }
-                    }
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_x < 7 && current_y < 7 {
-                        current_x += 1;
-                        current_y += 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        } else {
-                            game.board[current_x][current_y].can_move = true;
-                        }
-                    }
+                    show_bishop_moves(&game, &selected_tile);
+
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.Bishop,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
+                    
                 }
                 case .Rook: {
                     for i in 0..<8 {
@@ -615,57 +766,21 @@ main::proc() {
                         }
                     }
 
-                    current_x := selected_tile.x;
-                    current_y := selected_tile.y;
-                    for current_x > 0 {
-                        current_x -= 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        }
-                        game.board[current_x][current_y].can_move = true;
-                    }
+                    show_rook_moves(&game, &selected_tile);
 
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_x < 7 {
-                        current_x += 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        }
-                        game.board[current_x][current_y].can_move = true;
-                    }
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
 
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_y > 0 {
-                        current_y -= 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        }
-                        game.board[current_x][current_y].can_move = true;
-                    }
 
-                    current_x = selected_tile.x;
-                    current_y = selected_tile.y;
-                    for current_y < 7 {
-                        current_y += 1;
-                        if game.board[current_x][current_y].piece.type != .None {
-                            if game.board[current_x][current_y].piece.owner != selected_tile.piece.owner {
-                                game.board[current_x][current_y].can_move = true;
-                                break;
-                            } else {break}
-                        }
-                        game.board[current_x][current_y].can_move = true;
-                    }
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.Rook,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
+
                 }
                 case .King: {
                     for i in 0..<8 {
@@ -678,15 +793,49 @@ main::proc() {
                     if set_can_move(&game, x-1, y-1) {if game.board[x-1][y-1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x-1, y-1)}}
                     if set_can_move(&game, x-1, y  ) {if game.board[x-1][y  ].piece.owner == selected_tile.piece.owner {set_can_move(&game, x-1, y  )}}
                     if set_can_move(&game, x-1, y+1) {if game.board[x-1][y+1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x-1, y+1)}}
-                    if set_can_move(&game, x, y-1  ) {if game.board[x  ][y-1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x, y-1  )}}
-                    if set_can_move(&game, x, y+1  ) {if game.board[x  ][y+1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x, y+1  )}}
+                    if set_can_move(&game, x, y-1  ) {if game.board[x  ][y-1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x,   y-1)}}
+                    if set_can_move(&game, x, y+1  ) {if game.board[x  ][y+1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x,   y+1)}}
                     if set_can_move(&game, x+1, y-1) {if game.board[x+1][y-1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x+1, y-1)}}
                     if set_can_move(&game, x+1, y  ) {if game.board[x+1][y  ].piece.owner == selected_tile.piece.owner {set_can_move(&game, x+1, y  )}}
                     if set_can_move(&game, x+1, y+1) {if game.board[x+1][y+1].piece.owner == selected_tile.piece.owner {set_can_move(&game, x+1, y+1)}}
 
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.King,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
                 }
                 case .Queen: {
-    
+                    for i in 0..<8 {
+                        for j in 0..<8 {
+                            game.board[i][j].can_move = false;
+                        }
+                    }
+
+                    
+                    // game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
+
+                    show_bishop_moves(&game, &selected_tile);
+                    show_rook_moves(&game, &selected_tile);
+
+
+
+                    last_selected_tile = Tile {
+                        piece = Piece {
+                            type = PieceType.Queen,
+                            owner = selected_tile.piece.owner,
+                            moved = false,
+                        },
+                        x = selected_tile.x,
+                        y = selected_tile.y,
+                    };
                 }
             }
         }
