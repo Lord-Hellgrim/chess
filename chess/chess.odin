@@ -96,15 +96,15 @@ init_board :: proc() -> [8][8]Tile {
                 }
             }
 
-            // if j == 1 {
-            //     board[i][j] = Tile {
-            //         selected = false,
-            //         piece = Piece {
-            //             type = PieceType.Pawn,
-            //             owner = Side.Black,
-            //         },
-            //     }
-            // }
+            if j == 1 {
+                board[i][j] = Tile {
+                    selected = false,
+                    piece = Piece {
+                        type = PieceType.Pawn,
+                        owner = Side.Black,
+                    },
+                }
+            }
 
             if j == 7 {
                 if i == 0 || i == 7 {
@@ -151,15 +151,15 @@ init_board :: proc() -> [8][8]Tile {
                 }
             }
 
-            // if j == 6 {
-            //     board[i][j] = Tile {
-            //         selected = false,
-            //         piece = Piece {
-            //             type = PieceType.Pawn,
-            //             owner = Side.White,
-            //         },
-            //     }
-            // }
+            if j == 6 {
+                board[i][j] = Tile {
+                    selected = false,
+                    piece = Piece {
+                        type = PieceType.Pawn,
+                        owner = Side.White,
+                    },
+                }
+            }
 
         }
     }
