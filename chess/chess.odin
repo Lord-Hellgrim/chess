@@ -619,6 +619,7 @@ main::proc() {
                 }
 
                 game.board[tile_x][tile_y].piece = last_selected_tile.piece;
+                game.board[tile_x][tile_y].piece.moved = true;
                 game.board[last_selected_tile.x][last_selected_tile.y].piece = Piece {};
                 game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
                 selected_tile.piece = Piece{};
@@ -714,18 +715,75 @@ main::proc() {
                     
     
                     if selected_tile.piece.owner == Side.Black {
-                        if !selected_tile.piece.moved {
-                            game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
-                            game.board[selected_tile.x][sum8(selected_tile.y, 2)].can_move = true;
-                        } else if selected_tile.y < 7 {
-                            game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
+                        if !selected_tile.piece.moved  {
+                            if game.board[selected_tile.x][selected_tile.y+1].piece.type != .None {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = false;
+
+                            } else if game.board[selected_tile.x][selected_tile.y+2].piece.type != .None {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
+                                game.board[selected_tile.x][sum8(selected_tile.y, 2)].can_move = false;
+                            } else {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
+                                game.board[selected_tile.x][sum8(selected_tile.y, 2)].can_move = true;
+
+                            }
+                        } else {
+                            if game.board[selected_tile.x][selected_tile.y+1].piece.type != .None {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = false;
+
+                            } else if game.board[selected_tile.x][selected_tile.y+2].piece.type != .None {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
+                            } else {
+                                game.board[selected_tile.x][sum8(selected_tile.y, 1)].can_move = true;
+
+                            }
                         }
+
+                        if selected_tile.x > 0 {
+                            if game.board[selected_tile.x - 1][selected_tile.y + 1].piece.owner == .White {
+                                game.board[selected_tile.x - 1][selected_tile.y + 1].can_move = true;
+                            }
+                        }
+                        if selected_tile.x < 7 {
+                            if game.board[selected_tile.x + 1][selected_tile.y + 1].piece.owner == .White {
+                                game.board[selected_tile.x + 1][selected_tile.y + 1].can_move = true;
+                            }
+                        }
+
                     } else {
-                        if !selected_tile.piece.moved {
-                            game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
-                            game.board[selected_tile.x][diff8(selected_tile.y, 2)].can_move = true;
-                        } else if selected_tile.y < 7 {
-                            game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
+                        if !selected_tile.piece.moved  {
+                            if game.board[selected_tile.x][selected_tile.y-1].piece.type != .None {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = false;
+
+                            } else if game.board[selected_tile.x][selected_tile.y-2].piece.type != .None {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
+                                game.board[selected_tile.x][diff8(selected_tile.y, 2)].can_move = false;
+                            } else {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
+                                game.board[selected_tile.x][diff8(selected_tile.y, 2)].can_move = true;
+
+                            }
+                        } else {
+                            if game.board[selected_tile.x][selected_tile.y-1].piece.type != .None {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = false;
+
+                            } else if game.board[selected_tile.x][selected_tile.y-2].piece.type != .None {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
+                            } else {
+                                game.board[selected_tile.x][diff8(selected_tile.y, 1)].can_move = true;
+
+                            }
+                        }
+
+                        if selected_tile.x > 0 {
+                            if game.board[selected_tile.x - 1][selected_tile.y - 1].piece.owner == .Black {
+                                game.board[selected_tile.x - 1][selected_tile.y - 1].can_move = true;
+                            }
+                        }
+                        if selected_tile.x < 7 {
+                            if game.board[selected_tile.x + 1][selected_tile.y - 1].piece.owner == .Black {
+                                game.board[selected_tile.x + 1][selected_tile.y - 1].can_move = true;
+                            }
                         }
                     }
 
