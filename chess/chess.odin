@@ -579,7 +579,7 @@ main::proc() {
                 game.board[tile_x][tile_y].selected = false;
                 selected_tile = game.board[tile_x][tile_y];
 
-            } else /*if !(game.board[tile_x][tile_y].piece.type == PieceType.None)*/ {
+            } else {
                 
                 for i in 0..<8 {
                     for j in 0..<8 {
@@ -595,13 +595,18 @@ main::proc() {
                 fmt.print("\t");
                 fmt.print("selected_y");
                 fmt.println(selected_tile.y);
+                fmt.print("selected owner: \t");
                 fmt.println(selected_tile.piece.owner);
                 fmt.print("last_selected x:");
                 fmt.print(last_selected_tile.x);
                 fmt.print("\t");
                 fmt.print("last_selected_y");
                 fmt.println(last_selected_tile.y);
+                fmt.print("last_selected owner: \t");
                 fmt.println(last_selected_tile.piece.owner);
+                fmt.print("Whos_turn:\t");
+                fmt.println(game.whos_turn);
+
 
             }
 
@@ -617,6 +622,12 @@ main::proc() {
                 game.board[last_selected_tile.x][last_selected_tile.y].piece = Piece {};
                 game.board[last_selected_tile.x][last_selected_tile.y].selected = false;
                 selected_tile.piece = Piece{};
+
+                if game.whos_turn == .White {
+                    game.whos_turn = .Black;
+                } else {
+                    game.whos_turn = .White;
+                }
                 continue;
             }
         }
@@ -631,6 +642,40 @@ main::proc() {
             }
 
             
+        } else if selected_tile.piece.owner != game.whos_turn {
+            fmt.print("XXXXXXXXXXXXXXXXX");
+            for i in 0..<8 {
+                for j in 0..<8 {
+                    game.board[i][j].selected = false;
+                }
+            }
+
+            for i in 0..<8 {
+                for j in 0..<8 {
+                    game.board[i][j].can_move = false;
+                }
+            }
+
+            last_selected_tile = Tile {
+                piece = Piece {
+                    type = PieceType.None,
+                    owner = Side.None,
+                    moved = false,
+                },
+                x = selected_tile.x,
+                y = selected_tile.y,
+            };
+
+            selected_tile = Tile {
+                piece = Piece {
+                    type = PieceType.None,
+                    owner = selected_tile.piece.owner,
+                    moved = false,
+                },
+                x = selected_tile.x,
+                y = selected_tile.y,
+            };
+
         } else {
 
             switch selected_tile.piece.type {
@@ -824,8 +869,6 @@ main::proc() {
 
                     show_bishop_moves(&game, &selected_tile);
                     show_rook_moves(&game, &selected_tile);
-
-
 
                     last_selected_tile = Tile {
                         piece = Piece {
