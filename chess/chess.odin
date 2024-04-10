@@ -27,6 +27,15 @@ Piece :: struct {
     moved: bool,
 }
 
+serialize_Piece :: proc(piece: Piece) -> [3]u8{
+    output: [3]u8;
+    output[0] = u8(piece.type);
+    output[1] = u8(piece.owner);
+    output[2] = u8(piece.moved);
+
+    return output;
+}
+
 Tile :: struct {
     selected: bool,
     can_move: bool,
@@ -35,12 +44,89 @@ Tile :: struct {
     y: int,
 }
 
+serialize_Tile :: proc(tile: Tile) -> [7]u8 {
+    output: [7]u8;
+    output[0] = u8(tile.selected);
+    output[1] = u8(tile.can_move);
+    piece := serialize_Piece(tile.piece);
+    output[2] = piece[0];
+    output[3] = piece[1];
+    output[4] = piece[2];
+    output[5] = u8(tile.x);
+    output[6] = u8(tile.y);
+
+    return output;
+}
+
+deserialize_Tile :: proc(blob: []u8) -> Tile {
+    tile: Tile;
+
+    tile.selected = bool(blob[0]);
+    tile.can_move = bool(blob[1]);
+    switch blob[2] {
+        case 0: { tile.piece.type = .None }
+        case 1: { tile.piece.type = .Pawn }
+        case 2: { tile.piece.type = .Knight }
+        case 3: { tile.piece.type = .Bishop }
+        case 4: { tile.piece.type = .Rook }
+        case 5: { tile.piece.type = .King }
+        case 6: { tile.piece.type = .Queen }
+    };
+    switch blob[3] {
+        case 0: { tile.piece.owner = .None }
+        case 1: { tile.piece.owner = .White }
+        case 2: { tile.piece.owner = .Black }
+    };
+    tile.piece.moved = bool(blob[4]);
+    tile.x = int(blob[5]);
+    tile.y = int(blob[6]);
+
+    return tile;
+}
+
 
 GameState :: struct {
     board: [8][8]Tile,
     player1_id: string,
     player2_id: string,
     whos_turn: Side,
+}
+
+serialize_GameState :: proc(game_state: ^GameState) -> [448]u8 {
+    temp: [7]u8;
+    output: [448]u8;
+    index := 0;
+    for i in 0..<8 {
+        for j in 0..<8 {
+            temp = serialize_Tile(game_state.board[i][j]);
+            output[index] = temp[0];
+            output[index + 1] = temp[0 + 1];
+            output[index + 2] = temp[0 + 2];
+            output[index + 3] = temp[0 + 3];
+            output[index + 4] = temp[0 + 4];
+            output[index + 5] = temp[0 + 5];
+            output[index + 6] = temp[0 + 6];
+            index += 7;
+        }
+    }
+
+    return output;
+}
+
+deserialize_GameState :: proc(blob: ^[448]u8) -> [8][8]Tile {
+
+    new_board : [8][8]Tile;
+
+    index := 0;
+    for i in 0..<8 {
+        for j in 0..<8 {
+            new_board[i][j] = deserialize_Tile(blob[index:index+7]);
+            index += 7;
+        }
+    }
+
+    return new_board;
+
 }
 
 
@@ -325,6 +411,8 @@ draw_piece :: proc(i: int, j: int, owner: Side, shape: [16][16]u8) {
 
 render_board :: proc(game_state: ^GameState, color: rl.Color) {
     
+    rl.ClearBackground(rl.BLACK);
+
     for i in 0..<8 {
         for j in 0..<8 {
             if (i + j)%2 == 0{
@@ -590,22 +678,28 @@ main::proc() {
                 game.board[tile_x][tile_y].selected = true;
                 
                 selected_tile = game.board[tile_x][tile_y];
-                fmt.print("selected x:");
-                fmt.print(selected_tile.x);
-                fmt.print("\t");
-                fmt.print("selected_y");
-                fmt.println(selected_tile.y);
-                fmt.print("selected owner: \t");
-                fmt.println(selected_tile.piece.owner);
-                fmt.print("last_selected x:");
-                fmt.print(last_selected_tile.x);
-                fmt.print("\t");
-                fmt.print("last_selected_y");
-                fmt.println(last_selected_tile.y);
-                fmt.print("last_selected owner: \t");
-                fmt.println(last_selected_tile.piece.owner);
-                fmt.print("Whos_turn:\t");
-                fmt.println(game.whos_turn);
+                // fmt.print("selected x:");
+                // fmt.print(selected_tile.x);
+                // fmt.print("\t");
+                // fmt.print("selected_y");
+                // fmt.println(selected_tile.y);
+                // fmt.print("selected owner: \t");
+                // fmt.println(selected_tile.piece.owner);
+                // fmt.print("last_selected x:");
+                // fmt.print(last_selected_tile.x);
+                // fmt.print("\t");
+                // fmt.print("last_selected_y");
+                // fmt.println(last_selected_tile.y);
+                // fmt.print("last_selected owner: \t");
+                // fmt.println(last_selected_tile.piece.owner);
+                // fmt.print("Whos_turn:\t");
+                // fmt.println(game.whos_turn);
+                // fmt.println();
+                // fmt.println();
+                serial := serialize_GameState(&game);
+                deserial := deserialize_GameState(&serial);
+                // fmt.println(deserial[tile_x][tile_y]);
+                // fmt.println(game.board[tile_x][tile_y]);
 
 
             }
@@ -706,7 +800,10 @@ main::proc() {
 
                 }
                 case .Pawn: {
-    
+                    
+                    
+                    
+
                     for i in 0..<8 {
                         for j in 0..<8 {
                             game.board[i][j].can_move = false;
