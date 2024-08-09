@@ -372,7 +372,7 @@ render_board :: proc(game_state: ^GameState, color: rl.Color) {
 
 draw_menu :: proc() {
     draw_button(cstring("RESET GAME"), {512,0}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
-    draw_button(cstring("RESET GAME"), {512,128}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
+    draw_button(cstring("RESET GAME RESET GAME"), {512,128}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY, special_effect = SpecialEffect.Fancy)
     draw_button(cstring("RESET GAME"), {512,256}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
     draw_button(cstring("RESET GAME"), {512,384}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
 
