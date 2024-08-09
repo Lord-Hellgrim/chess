@@ -367,13 +367,15 @@ render_board :: proc(game_state: ^GameState, color: rl.Color) {
             }
         }
     }
-    draw_menu :: proc(gamestate: ^GameState) {
-    rl.DrawRectangleRec(rl.Rectangle{512,0, 256,256}, rl.RED)
-}
+    draw_menu()
 }
 
-draw_menu :: proc(gamestate: ^GameState) {
-    rl.DrawRectangleRec(rl.Rectangle{512,0, 256,256}, rl.RED)
+draw_menu :: proc() {
+    draw_button(cstring("RESET GAME"), {512,0}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
+    draw_button(cstring("RESET GAME"), {512,128}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
+    draw_button(cstring("RESET GAME"), {512,256}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
+    draw_button(cstring("RESET GAME"), {512,384}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
+
 }
 
 
@@ -540,6 +542,41 @@ show_rook_moves :: proc(game: ^GameState, selected_tile: ^Tile) {
     }
 }
 
+unselect_board :: proc(game: ^GameState) {
+    for i in 0..<8 {
+        for j in 0..<8 {
+            game.board[i][j].selected = false
+        }
+    }
+}
+
+button1 :: proc(game: ^GameState) {
+    game.board = init_board()
+    game.whos_turn = .White
+}
+
+button2 :: proc(game: ^GameState) {
+    // game.board = init_board()
+}
+
+button3 :: proc(game: ^GameState) {
+    // game.board = init_board()
+}
+
+button4 :: proc(game: ^GameState) {
+    // game.board = init_board()
+}
+
+process_ui :: proc(input: ^User_Input, game: ^GameState) {
+    switch input.mouse_tile_y {
+        case 0..<128:   button1(game)
+        case 128..<256: button2(game)
+        case 256..<384: button3(game)
+        case 384..<512: button4(game)
+        
+    }
+}
+
 main::proc() {
 
     Board := init_board();
@@ -566,7 +603,10 @@ main::proc() {
         if user_input.left_mouse_clicked {
             
             if user_input.mouse_tile_x > 512 {
-                continue
+                defer user_input.mouse_tile_x = 0
+                defer unselect_board(&game)
+                process_ui(&user_input, &game)
+
             }
             tile_x := user_input.mouse_tile_x/64;
             tile_y := user_input.mouse_tile_y/64;
