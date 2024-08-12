@@ -280,6 +280,13 @@ LIGHTGREEN : rl.Color : {
     255, 
 };
 
+ALMOST_BLACK : rl.Color : {
+    10,
+    10,
+    10,
+    10,
+}
+
 draw_piece :: proc(i: int, j: int, owner: Side, shape: [16][16]u8) {
     
     color: rl.Color;
@@ -307,7 +314,7 @@ draw_piece :: proc(i: int, j: int, owner: Side, shape: [16][16]u8) {
 
 render_board :: proc(game_state: ^GameState, color: rl.Color) {
     
-    rl.ClearBackground(rl.BLACK);
+    rl.ClearBackground(ALMOST_BLACK);
 
     for i in 0..<8 {
         for j in 0..<8 {
@@ -368,11 +375,13 @@ render_board :: proc(game_state: ^GameState, color: rl.Color) {
         }
     }
     draw_menu()
+
+
 }
 
 draw_menu :: proc() {
     draw_button(cstring("RESET GAME"), {512,0}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
-    draw_button(cstring("RESET GAME RESET GAME"), {512,128}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY, special_effect = SpecialEffect.Fancy)
+    draw_button(cstring("RESET GAME"), {512,128}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY, special_effect = SpecialEffect.Fancy)
     draw_button(cstring("RESET GAME"), {512,256}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
     draw_button(cstring("RESET GAME"), {512,384}, {256,128}, rl.LIGHTGRAY, rl.DARKGRAY)
 
@@ -592,7 +601,11 @@ main::proc() {
 
     rl.InitWindow(512+256, 512, "test");
     rl.SetWindowState( rl.ConfigFlags{} );
+    target := rl.LoadRenderTexture(512+256, 512)
     rl.SetTargetFPS(60);
+
+    outlineShader := rl.LoadShader(cstring("outline.vs"), cstring("outline.fs"))
+    resolution : [2]f32 = {512+256, 512}
 
     selected_tile: Tile;
     last_selected_tile: Tile;
@@ -961,14 +974,22 @@ main::proc() {
                 }
             }
         }
+        rl.SetShaderValue(outlineShader, rl.GetShaderLocation(outlineShader, "resolution"), &resolution ,rl.ShaderUniformDataType.VEC2)
 
+        rl.BeginTextureMode(target)
+        
+        rl.ClearBackground(rl.BLANK)
+        render_board(&game, rl.LIGHTGRAY);
 
+        rl.EndTextureMode()
 
 
         rl.BeginDrawing();
-        render_board(&game, rl.LIGHTGRAY);
         
 
+        rl.BeginShaderMode(outlineShader);
+        rl.DrawTextureRec(target.texture, rl.Rectangle{ 0, 0, f32(target.texture.width), f32(-target.texture.height) }, { 0, 0 }, rl.WHITE);  // Draw the render texture with shader
+        rl.EndShaderMode();
 
         rl.EndDrawing();
     }
